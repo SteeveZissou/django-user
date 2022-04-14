@@ -1,32 +1,27 @@
-from multiprocessing import context
+
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import redirect, render
+
 
 # Create your views here.
+from accounts.forms import UserRegistrationForm
 
-from accounts.models import CustomUser
-from django.contrib.auth.forms import UserCreationForm
+def profile(request):
+    return HttpResponse(f"{request.user.email}")
 
-class CustomSignupForm(UserCreationForm):
-    """
-    replace auth.User by accounts.CustomUser
-    """
-    class Meta:
-        model = CustomUser
-        fields = UserCreationForm.Meta.fields
+def home(request):
+    return HttpResponse("Accueil du site")
 
 def signup(request):
     context = {}
-        
+    
     if request.method == "POST":
-        form = CustomSignupForm(request.POST)
+        form = UserRegistrationForm(request.POST)
         if form.is_valid():
             form.save()
-            return HttpResponse("Bienvenue !")
-        else:
-            context["errors"] = form.errors
-            
-    form = CustomSignupForm()
+            return redirect("home")
+                
+    form = UserRegistrationForm()
     context["form"] = form
     return render(request, "accounts/signup.html", context=context)
         
